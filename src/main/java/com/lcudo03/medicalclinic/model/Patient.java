@@ -1,4 +1,4 @@
-package model;
+package com.lcudo03.medicalclinic.model;
 
 
 import lombok.*;
