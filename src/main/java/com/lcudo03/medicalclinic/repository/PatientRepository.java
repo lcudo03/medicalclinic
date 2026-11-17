@@ -5,8 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.beans.BeanUtils;
+import com.lcudo03.medicalclinic.exception.PatientNotFoundException;
 
 @Repository
 public class PatientRepository {
@@ -16,25 +17,39 @@ public class PatientRepository {
         return new ArrayList<>(patientsList);
     }
 
-    public Patient findByEmail(String email){
+    public Optional<Patient> findByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+
         return patientsList.stream()
                 .filter(patient -> patient.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
-    public void createNewPatient(Patient newPatient){
-        patientsList.add(newPatient);
+    public Patient addPatient(Patient patient) {
+        patientsList.add(patient);
+        return patient;
     }
 
-    public void deleteByEmail(String email){
-        patientsList.removeIf(patient -> patient.getEmail().equals(email));
+    public boolean deleteByEmail(String email) {
+        return findByEmail(email)
+                .map(patientsList::remove)
+                .orElse(false);
     }
 
-    public void modifyByEmail(String email, Patient updatedPatient){
-        Patient patient = findByEmail(email);
-        if (patient != null){
-            BeanUtils.copyProperties(updatedPatient, patient);
-        }
+    public Patient modifyByEmail(String email, Patient updatedPatient) {
+        Patient patient = findByEmail(email)
+                .orElseThrow(() -> new PatientNotFoundException(email));
+
+        patient.setFirstName(updatedPatient.getFirstName());
+        patient.setLastName(updatedPatient.getLastName());
+        patient.setPhoneNumber(updatedPatient.getPhoneNumber());
+        patient.setBirthday(updatedPatient.getBirthday());
+        patient.setIdCardNo(updatedPatient.getIdCardNo());
+        patient.setPassword(updatedPatient.getPassword());
+
+        return patient;
     }
 }
+

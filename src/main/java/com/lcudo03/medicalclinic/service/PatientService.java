@@ -1,5 +1,7 @@
 package com.lcudo03.medicalclinic.service;
 
+import com.lcudo03.medicalclinic.exception.PatientAlreadyExistsException;
+import com.lcudo03.medicalclinic.exception.PatientNotFoundException;
 import com.lcudo03.medicalclinic.model.Patient;
 import com.lcudo03.medicalclinic.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,23 +14,31 @@ import java.util.List;
 public class PatientService {
     private final PatientRepository patientRepository;
 
-    public List<Patient> getPatients(){
+    public List<Patient> getPatients() {
         return patientRepository.findAll();
     }
-    public Patient getPatient(String email){
-        return patientRepository.findByEmail(email);
+
+    public Patient getPatient(String email) {
+        return patientRepository.findByEmail(email)
+                .orElseThrow(() -> new PatientNotFoundException(email));
     }
 
-    public void addPatient(Patient newPatient){
-        patientRepository.createNewPatient(newPatient);
+    public Patient addPatient(Patient patient) {
+        if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
+            throw new PatientAlreadyExistsException(patient.getEmail());
+        }
+
+        return patientRepository.addPatient(patient);
     }
 
-    public void removePatient(String email){
-        patientRepository.deleteByEmail(email);
+    public void removePatient(String email) {
+        if (!patientRepository.deleteByEmail(email)) {
+            throw new PatientNotFoundException(email);
+        }
     }
 
-    public void modifyPatient(String email, Patient updatedPatient){
-        patientRepository.modifyByEmail(email, updatedPatient);
+    public Patient modifyPatient(String email, Patient patient) {
+        return patientRepository.modifyByEmail(email, patient);
     }
 
 }
