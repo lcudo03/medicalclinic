@@ -1,15 +1,15 @@
 package com.lcudo03.medicalclinic.repository;
 
 import com.lcudo03.medicalclinic.model.Patient;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.lcudo03.medicalclinic.exception.PatientNotFoundException;
-
 @Repository
+@RequiredArgsConstructor
 public class PatientRepository {
     private final List<Patient> patientsList = new ArrayList<>();
 
@@ -23,7 +23,7 @@ public class PatientRepository {
         }
 
         return patientsList.stream()
-                .filter(patient -> patient.getEmail().equals(email))
+                .filter(patient -> email.equals(patient.getEmail()))
                 .findFirst();
     }
 
@@ -38,10 +38,7 @@ public class PatientRepository {
                 .orElse(false);
     }
 
-    public Patient modifyByEmail(String email, Patient updatedPatient) {
-        Patient patient = findByEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
-
+    public Patient modifyByEmail(Patient patient, Patient updatedPatient) {
         patient.setFirstName(updatedPatient.getFirstName());
         patient.setLastName(updatedPatient.getLastName());
         patient.setPhoneNumber(updatedPatient.getPhoneNumber());
@@ -50,6 +47,10 @@ public class PatientRepository {
         patient.setPassword(updatedPatient.getPassword());
 
         return patient;
+    }
+
+    public void changePassword(Patient patient, String newPassword) {
+        patient.setPassword(newPassword);
     }
 }
 

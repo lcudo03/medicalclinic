@@ -1,5 +1,9 @@
 package com.lcudo03.medicalclinic.controller;
 
+import com.lcudo03.medicalclinic.dto.ChangePassword;
+import com.lcudo03.medicalclinic.dto.CreatePatientDTO;
+import com.lcudo03.medicalclinic.dto.PatientDTO;
+import com.lcudo03.medicalclinic.dto.UpdatePatientDTO;
 import com.lcudo03.medicalclinic.model.Patient;
 import com.lcudo03.medicalclinic.service.PatientService;
 import jakarta.validation.Valid;
@@ -16,20 +20,29 @@ public class PatientController {
 
     private final PatientService service;
 
+
     @GetMapping
-    public List<Patient> getPatients() {
+    public List<PatientDTO> getPatients() {
         return service.getPatients();
     }
 
     @GetMapping("/{email}")
-    public Patient getPatient(@PathVariable String email) {
-        return service.getPatient(email);
+    public PatientDTO getPatient(@PathVariable String email) {
+        return service.getPatientDTO(email);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Patient addPatient(@Valid @RequestBody Patient patient) {
-        return service.addPatient(patient);
+    public PatientDTO addPatient(
+            @Valid @RequestBody CreatePatientDTO dto) {
+        return service.addPatient(dto);
+    }
+
+    @PutMapping("/{email}")
+    public PatientDTO modifyPatient(
+            @PathVariable String email,
+            @Valid @RequestBody UpdatePatientDTO dto) {
+        return service.modifyPatient(email, dto);
     }
 
     @DeleteMapping("/{email}")
@@ -38,8 +51,12 @@ public class PatientController {
         service.removePatient(email);
     }
 
-    @PutMapping("/{email}")
-    public Patient modifyPatient(@PathVariable String email, @Valid @RequestBody Patient updatedPatient) {
-        return service.modifyPatient(email, updatedPatient);
+    @PatchMapping("/{email}/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(
+            @PathVariable String email,
+            @Valid @RequestBody ChangePassword request) {
+        service.changePassword(email, request);
     }
+
 }

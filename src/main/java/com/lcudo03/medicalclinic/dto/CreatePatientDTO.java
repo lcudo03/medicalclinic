@@ -1,0 +1,18 @@
+
+package com.lcudo03.medicalclinic.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+
+public record CreatePatientDTO(
+        @NotBlank @Email String email,
+        @NotBlank String password,
+        @NotBlank String idCardNo,
+        @NotBlank String firstName,
+        @NotBlank String lastName,
+        @NotBlank String phoneNumber,
+        @NotNull LocalDate birthday
+) {
+}
